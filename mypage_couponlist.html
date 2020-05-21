@@ -1,0 +1,135 @@
+
+{* 최상단 HEAD *}
+{include file = "../include/inbyu_v3/htmlMobHead.inc"}
+
+{* BODY *}
+{include file = "../include/inbyu_v3/htmlMobBody.inc"}
+
+{* TOP *}
+{include file = "../include/inbyu_v3/htmlMobTop.inc"}
+
+{literal}
+<style type="text/css">
+.copy_btn span {
+  display:none;
+}
+.copy_btn {
+  cursor: pointer;
+}
+
+// 2019-07-03 추가
+ .coupon-btn {margin-right:10px; padding-left:10px; width:330px; color:#222; background:#ff0000;  border:1px solid #FFE13D;}
+
+</style>
+
+<script type="text/javascript">
+<!--
+//	팝업
+function popup(width, height, left, top, url, name, scroll, resizable)
+{
+	window.open(url,name,'height='+ height +', width ='+ width +',left='+ left +',top='+ top +', scrollbars='+ scroll +',resizable='+ resizable +',menubar=no,toolbar=no,location=no,status=yes');
+}
+
+
+$(document).ready(function(){
+	$('.copy_btn').click(function(){
+		$('#copy_text_input').val($(this).find("span").html());
+		$('#copy_text_input').select();			//복사할 텍스트를 선택
+		document.execCommand("copy");			//클립보드 복사 실행
+		alert('쿠폰번호를 복사하였습니다.');
+	});
+});
+
+
+//-->
+</script>
+
+{/literal}
+
+
+			<div id="visual">
+				<h2 class="hide">비쥬얼</h2>
+
+				<!-- <div class="sub-visual">
+
+				</div> -->
+			</div><!-- end : id : visual -->
+
+			<div id="contents">
+				<h2 class="hide">컨텐츠</h2>
+				<div class="sub_contents">
+					<h3 class="sub_Title">
+						<a href="javascript:history.back()" class="back"><img src="img/v3/btn/btn_back.jpg" alt="이전페이지 가기" /></a>
+						쿠폰관리
+					</h3>
+
+					<div class="in_box">
+
+							<div class="speake_box">
+								<p class="info">
+									- 인바이유를 이용해주시는 분께 제공되는 사은쿠폰입니다.<br />
+									- <b>쿠폰은 해외여행보험 상품에만 이용가능합니다.</b><br />
+									- 동반자가 있으신경우 함께 적용 됩니다.<br />
+									- 쿠폰번호를 복사하여 지인에게 나눔하실 수 있습니다.<br />
+									- 쿠폰유효기간내에 사용 가능하며 기간 경과시 소멸됩니다.<br />
+									- <b>주문 취소시 사용한 쿠폰은 환원되지 않습니다.</b><br />
+									- 쿠폰을 복사하여 지인에게 나눔 후 지인이 해당 쿠폰을 이용하면 쿠폰목록에서 사라지게 됩니다.<br />
+							</div>
+								<div style="border: solid 1px #fff; width: 0px; overflow: hidden;">
+									<input type="text" name="copy_text_input" id="copy_text_input" style="background: #000">
+								</div>
+
+							<div class="resTable">
+									<table class="tableStyle">
+										<caption>쿠폰관리</caption>
+										<colgroup>
+											<col style="width:5%" /><col style="width:11%" /><col style="width:11%" /><col style="width:11%" /><col style="width:*%" />
+											<col style="width:11%" /><col style="width:11%" /><col style="width:11%" />
+										</colgroup>
+										<tbody>
+{section name=key loop=$RS.list}
+												<td data-title="번호">
+													{$RS.list[key].coupon_id} {if $RS.list[key].use_fg_txt == "사용가능" }
+													<span style="border:solid 1px;padding:5px;color:#E2E5EE">
+														<img src="img/v3/contents/m_coupon_ico.png" style="width: 20px;"><a href="#self" class="copy_btn"> 쿠폰번호 복사<span>{$RS.list[key].coupon_id}</span></a>
+													</span>{/if}<br>
+													{$RS.list[key].use_st} ~ {$RS.list[key].use_en} 까지
+
+
+												</td>
+											</tr>
+{sectionelse}
+
+											<tr>
+												<td colspan="9" class="empty"><div class="emptyItem">가입한내역이 없습니다.</div></td>
+											</tr>
+{/section}
+
+										</tbody>
+									</table>
+							</div>
+
+			<div class="pagination">
+			{$PREV_PAGE}
+			{section name=key loop=$PAGE_LIST}
+				{$PAGE_LIST[key]}
+			{sectionelse}
+			<strong class='on'>1</strong>
+			{/section}
+			{$NEXT_PAGE}
+			</div>
+
+						<!-- *** end : join *** -->
+
+					</div>
+				</div><!-- end : class : sub_contents -->
+			</div><!-- end : id : contents -->
+
+
+
+
+{* COPYRIGHT *}
+{include file = "../include/inbyu_v3/htmlMobCopyright.inc"}
+
+{* BOTTOM *}
+{include file = "../include/inbyu_v3/htmlMobBottom.inc"}
