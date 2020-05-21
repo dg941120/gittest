@@ -1,0 +1,519 @@
+{* 최상단 HEAD *}
+{include file = "../include/inbyu_v3/htmlMobHead.inc"}
+
+{* BODY *}
+{include file = "../include/inbyu_v3/htmlMobBody.inc"}
+
+{* TOP *}
+{include file = "../include/inbyu_v3/htmlMobTop.inc"}
+
+{literal}
+<script src="//developers.kakao.com/sdk/js/kakao.min.js"></script>
+<style type="text/css">
+#vt {
+  position: absolute;
+  right: 8px;
+  bottom: 16px;
+}
+</style>
+<script type="text/javascript">
+<!--
+
+function sns_open(url, sns){
+
+	var myForm = document.frmurl;
+	myForm.action=url; 
+	myForm.method="post";
+	myForm.target="_self";
+	myForm.submit();
+
+}
+
+// 쿠키값 가져오기
+function getCookie(key)
+{
+	var cook = document.cookie + ";";
+	var idx = cook.indexOf(key, 0);
+	var val = "";
+
+	if(idx != -1) {
+
+		cook = cook.substring(idx, cook.length);
+		begin = cook.indexOf("=", 0) + 1;
+		end = cook.indexOf(";", begin);
+		val = unescape( cook.substring(begin, end) );
+	}
+
+	return val;
+}
+
+// 쿠키값 저장
+function setCookie(name, value, expiredays)
+{
+	var todayDate = new Date();
+	todayDate.setDate( todayDate.getDate() + expiredays );
+	document.cookie = name + "=" + escape( value ) + "; path=/; expires=" + todayDate.toGMTString() + ";"
+}
+
+// 쿠키에 로그인 정보 저장
+function saveLogin(id)
+{
+	if(id != "") {
+
+		// userid 쿠키에 id 값을 7일간 저장
+		setCookie("userid", id, 7);
+	}
+	else {
+
+		// userid 쿠키 삭제
+		setCookie("userid", id, -1);
+	}
+}
+
+function getLogin()
+{
+	// userid 쿠키에서 id 값을 가져온다.
+	var id = getCookie("userid");
+
+	// 가져온 쿠키값이 있으면
+	if(id != "") {
+
+		$("#mail").focus();
+		$('#reg_id').attr("checked", true);
+		$('#mail').val(id);
+
+	}
+	else $("#mail").focus();
+}
+
+function frmSubmit(f_data)
+{
+	var action = f_data['action'];
+
+	$.ajax({
+		type: "POST",
+		url: action,
+		data: f_data,
+		dataType: 'json',
+		success: function(response) {
+			if(response) {
+
+				if(response.msg)
+					alert(response.msg);
+
+				if(response.stime == "yes")
+					TimerStart();
+
+				if(response.url)
+					location.replace(response.url);
+			}
+		}
+	});
+	return false;
+}
+{/literal}
+var SetTime = {$RS.chktime};		// 최초 설정 시간(기본 : 초)
+{literal}
+function msg_time()
+{	// 1초씩 카운트
+
+	var sc = (SetTime % 60);
+	sc = (sc > 9) ? sc : "0"+ sc;
+
+	mtime = Math.floor(SetTime / 60) +":"+ sc;	// 남은 시간 계산
+
+	var msg = "<span style='color: red; font-size: 140%;' id='vtime'>남은시간 0" + mtime + "</span>";
+
+	$("#vt").html(msg);		// div 영역에 보여줌
+
+	SetTime--;					// 1초씩 감소
+
+	if (SetTime < 0) {			// 시간이 종료 되었으면..
+
+		clearInterval(tid);		// 타이머 해제
+		var msg = "<span>&nbsp;</span>";
+		$("#vt").html(msg);		// div 영역에 보여줌
+{/literal}
+		SetTime = {$RS.chktime};		// 최초 설정 시간(기본 : 초)
+{literal}
+		return false;
+	}
+}
+
+function TimerStart()
+{
+	tid=setInterval('msg_time()',1000)
+}
+
+$(document).ready(function() {
+
+	$("#mail").keyup(function() {
+
+		var regex=/^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/;
+
+		var email = $("#mail").val();
+
+		if(regex.test(email) === false){
+
+			$(".email_txt").html("이메일을 올바르게 입력하세요");
+			$(".email_txt").css("display","block");
+			return false;
+		}
+		else {
+
+			$(".email_txt").css("display","none");
+			return false;
+		}
+	});
+
+	$("#pass").keyup(function() {
+
+
+
+
+
+
+		if($("#pass").val() == "") {
+
+			return false;
+		}
+
+		if($("#pass").val().length < 6 || $("#pass").val().length > 16) {
+
+			$(".pass_txt").css("display","block");
+        	$(".pass_txt").html("비밀번호는 문자, 숫자, 특수문자의 조합으로 6~15자리로 입력해주세요.");
+			return false;
+		}
+		else if(!$("#pass").val().match(/([a-zA-Z0-9].*[`,!,@,#,$,%,^,&,*,?,_,~,\-,(,),+,_,,,/,:,;,<,=,>,{,},~,|,\\,\',\",\[,\]])|([`,!,@,#,$,%,^,&,*,?,_,~,\-,(,),+,_,,,/,:,;,<,=,>,{,},~,|,\\,\',\",\[,\]].*[a-zA-Z0-9])/))  {
+
+			$(".pass_txt").html("비밀번호는 문자, 숫자, 특수문자의 조합으로 6~15자리로 입력해주세요.");
+	        return false;
+		}
+		else {
+
+			$(".pass_txt").css("display","none");
+			$(".pass_txt").html("");
+		}
+		//`
+	});
+
+	$(".ok-chk").click(function() {
+
+		if($("#reg_id").is(":checked") == true) saveLogin($("#mail").val());
+		else saveLogin("");
+
+		if($("#mail").val() == "") {
+
+        	$(".email_txt").css("display","block");
+		}
+		if($("#pass").val() == "") {
+
+        	$(".pass_txt").css("display","block");
+		}
+
+		if($("#mail").val() == "" || $("#pass").val() == "") {
+
+        	return false;
+		}
+
+		var f_data = {
+			action: '/index.htm',
+			mode: 'login',
+			mtype: 'proc',
+			email: $("#mail").val(),
+			pass: $("#pass").val(),
+			url: $("#url").val(),
+		};
+		frmSubmit(f_data);
+	});
+
+	$(".ok-sms").click(function() {
+
+		if($('#vtime').html() != undefined) {
+
+        	alert("문자가 발송되었습니다.\n\n잠시 후 다시 시도해 주시기 바랍니다.!");
+        	return false;
+		}
+		else if($("#name").val() == "") {
+
+        	alert("이름을 입력해주세요");
+        	return false;
+		}
+		else if($("#hp").val() == "") {
+
+        	alert("휴대폰번호를 입력해주세요");
+        	return false;
+		}
+
+		var f_data = {
+			action: '/index.htm',
+			mode: 'login',
+			mtype: 'sms',
+			name: $("#name").val(),
+			hp: $("#hp").val(),
+		};
+		frmSubmit(f_data);
+	});
+
+	$(".ok-ord").click(function() {
+
+		if($("#name").val() == "") {
+
+        	alert("이름을 입력해주세요");
+        	return false;
+		}
+		else if($("#hp").val() == "") {
+
+        	alert("휴대폰번호를 입력해주세요");
+        	return false;
+		}
+		else if($("#cfNum").val() == "") {
+
+        	alert("인증번호를 입력해주세요");
+        	return false;
+		}
+
+		var f_data = {
+			action: '/index.htm',
+			mode: 'login',
+			mtype: 'ord_proc',
+			name: $("#name").val(),
+			hp: $("#hp").val(),
+			cfnum: $("#cfNum").val(),
+			url: $("#url").val(),
+		};
+		frmSubmit(f_data);
+	});
+
+	$(".ok-nice").click(function() {
+
+		if($("#name").val() == "") {
+
+        	alert("이름을 입력해주세요");
+        	return false;
+		}
+		else if ($("#rrn1").val() == "") {
+
+			alert("주민등록 앞자리를 꼭 입력하세요!");
+			$("#rrn1").focus();
+			$("#rrn1").parent().addClass("on");
+			return false;
+		}
+		else if ($("#rrn2").val() == "") {
+
+			alert("주민등록 뒷자리를 꼭 입력하세요!");
+			$("#rrn2").focus();
+			$("#rrn2").parent().addClass("on");
+			return false;
+		}
+		else if($("#phone").val() == "") {
+
+        	alert("휴대폰번호를 입력해주세요");
+        	return false;
+		}
+
+		var f_data = {
+			action: '/index.htm',
+			mode: 'login',
+			mtype: 'nice_proc',
+			name: $("#name").val(),
+			jumin_1: $("#rrn1").val(),
+			jumin_2: $("#rrn2").val(),
+			hp: $("#phone").val(),
+			url: $("#url").val(),
+		};
+		frmSubmit(f_data);
+	});
+});
+
+$(document).ready(function() {
+	getLogin();
+});
+
+window.name ="Parent_window";
+
+function fnPopup()
+{
+	var iXPos;
+    var iYPos;
+    var iwidth = 500;
+    var iheight = 550;
+
+    iXPos = (window.screen.width - iwidth) / 2;
+    iYPos = (window.screen.height - iheight) / 2;
+
+	window.open('', 'popupChk', 'width='+ iwidth +', height='+ iheight +', top='+ iYPos +', left='+ iXPos +', fullscreen=no, menubar=no, status=no, toolbar=no, titlebar=yes, location=no, scrollbar=no');
+	document.form_chk.action = "https://nice.checkplus.co.kr/CheckPlusSafeModel/checkplus.cb";
+	document.form_chk.target = "popupChk";
+	document.form_chk.submit();
+}
+
+function memberFg()
+{
+	alert('해당 보험 또는 서비스의 경우 회원가입을 하셔야 합니다.');
+	setTimeout("$('.loginTab>li>a:first').trigger('click')", 10);
+}
+
+function maxLengthCheck(object)
+{
+	if (object.value.length > object.maxLength){
+		object.value = object.value.slice(0, object.maxLength);
+	}
+}
+//-->
+</script>
+{/literal}
+
+
+
+			<div id="visual">
+				<h2 class="hide">비쥬얼</h2>
+
+				<!-- <div class="sub-visual">
+
+				</div> -->
+			</div><!-- end : id : visual -->
+
+			<div id="contents">
+				<h2 class="hide">컨텐츠</h2>
+				<div class="sub_contents">
+
+						<!-- *** start : join *** -->
+
+							<ul class="loginTab">
+{if $RS.gubun > 0}
+								<li><a href="#self" {if $RS.member_fg == '1'}onClick="memberFg();"{/if}>간편 가입</a></li>
+{else}
+								<li><a href="#self" {if $RS.member_fg == '1'}onClick="memberFg();"{/if}>간편 로그인 </a></li>
+{/if}
+								<li><a href="#self" id='fs1'>로그인</a></li>
+							</ul>
+
+							<form name="form_chk" method="post">
+								<div class="login-Box">
+									<div class="in_box">
+
+{if $RS.gubun > 0}
+										<h3 class="title">
+											<span style="display: block; color: #333; font-size: 110%; text-align:center; ">실명 인증 이후 간편하게 가입하실 수 있습니다.</span>
+										</h3><br><br>
+										<dl class="input-zip">
+											<dt><label for="name">가입자 이름</label></dt>
+											<dd>
+												<div class="input inputPlace"><label for="name">이름</label><input type="text" id="name" title="가입자 이름을 입력하세요"  /> </div>
+											</dd>
+											<dt><label for="hp">주민등록번호</label></dt>
+											<dd class="type">
+												<div class="rrtInput inputPlace"><label for="rrn1">주민번호 앞자리</label><input type="tel" id="rrn1" maxlength="6" oninput="maxLengthCheck(this)" class="jumin_1" name="jumin_1[]" title="주민등록번호 앞자리를 입력하세요" /> </div>
+												<div class="rrtInput inputPlace"><label for="rrn2">주민번호 뒷자리</label><input type="password" id="rrn2" class="numbersOnly jumin_2" maxlength="7" oninput="maxLengthCheck(this)" name="jumin_2[]" title="주민등록번호 뒷자리를 입력하세요" /> </div>
+											</dd>
+											<dt><label for="cfNum">휴대폰번호</label></dt>
+											<dd>
+												<div class="input inputPlace"><label for="phone">휴대폰번호 입력</label><input type="number" class="numberOnly user_phone" id="phone" maxlength="11" name='user_phone[]' oninput="maxLengthCheck(this)" title="휴대폰번호을 입력하세요" /> </div>
+											</dd>
+										</dl>
+
+										<div class="joinBtn ok-nice"><a href="#self">인증 후 가입하기</a></div>
+{else}
+										<h3 class="title">
+											<span style="display: block; color: #333; font-size: 110%; text-align:center; ">가입 시 등록된 정보 확인 후 조회됩니다.</span>
+										</h3><br><br>
+										<!--</h3>
+										<h3 class="join_Title">비회원 가입내역 조회
+											<span>가입시 등록된 정보로 인증 이후 조회 됩니다.</span>
+										</h3>-->
+										<dl class="input-zip">
+											<dt><label for="name">가입자 이름</label></dt>
+											<dd>
+												<div class="input inputPlace"><label for="name">이름</label><input type="text" id="name" title="가입자 이름을 입력하세요"  /> </div>
+											</dd>
+											<dt><label for="hp">휴대폰번호</label></dt>
+											<dd class="type">
+												<div class="input inputPlace"><label for="hp">휴대폰번호 입력</label><input type="tel" id="hp" title="휴대폰번호을 입력하세요" /></div>
+												<div class="btn"><a href="#self" class="ok-sms">발송</a></div>
+											</dd>
+											<dt><label for="cfNum">인증번호</label></dt>
+											<dd>
+												<div class="input inputPlace"><label for="cfNum">인증번호 입력</label><input type="tel" id="cfNum" title="인증번호을 입력하세요" /> </div>
+											</dd>
+										</dl>
+										<div class="joinBtn ok-ord"><a href="#self">인증 후 로그인</a></div>
+{/if}
+{*
+										<div class="in">
+											<div class="certify-Box"><img src="img/v3/contents/hp_certify.gif" alt="휴대폰 인증" />
+											</div>
+											<div class="joinBtn"><a href="#none" onClick="fnPopup()">휴대폰 인증</a></div>
+										</div>
+*}
+
+										<div class="sns-Login">
+											{*<div><a href="sns_join_2.html"><img src="img/v3/btn/btn_login_sns_1.gif" alt="facebook" /></a></div>*}
+											<div><a href="javascript:sns_open('/index.htm?mode=sns&mtype=sns_oauth&sns=kakao&sns_login=1&ac=m', 'kakao' );"><img src="img/v3/btn/kakao_account_login.png" alt="kakao" /></a></div>
+											{*<div><a href="#self"><img src="img/v3/btn/btn_login_sns_3.gif" alt="NAVER" /></a></div>
+											<div><a href="#self"><img src="img/v3/btn/btn_login_sns_4.gif" alt="Instagram" /></a></div>*}
+										</div>
+
+										<input type="hidden" name="m" value="checkplusSerivce">
+										<input type="hidden" name="EncodeData" value="{$NICE.enc_data}">
+
+									</div>
+								</div><!-- end : class : login-Box -->
+							</form>
+						<!-- *** end : join *** -->
+
+							<div class="login-Box">
+								<div class="in_box">
+									<dl class="input-zip">
+										<dt><label for="mail">이메일</label></dt>
+										<dd>
+											<div class="input inputPlace"><label for="mail">이메일을 입력하세요.</label><input type="email" id="mail" title="이메일을 입력하세요"  /> </div>
+											<div class="alert email_txt" style="display:none;">이메일을 올바르게 입력하세요.</div>
+										</dd>
+										<dt><label for="pass">비밀번호</label></dt>
+										<dd>
+											<div class="input inputPlace"><label for="pass">비밀번호</label><input type="password" id="pass" title="비밀번호를 입력하세요" /> </div>
+											<div class="alert pass_txt" style="display:none;">비밀번호를 올바르게 입력하세요.</div>
+										</dd>
+									</dl>
+
+									<p class="chkMdu">
+										<label for="reg_id" class="chkLabel a"><input type="checkbox" id="reg_id"  value="1" title="아이디저장시 체크하세요" /></label>
+										<label for="reg_id"> ID 저장 </label>
+									</p>
+
+									<!-- <input type="checkbox" id="reg_id" value="1"> -->
+									<div class="joinBtn ok-chk"><a href="#none">로그인</a></div>
+									<form name="frmurl" method="post">
+										<input type="hidden" name="reurl" value="{$_GET.url}" />
+									</form>
+									<div class="login_navi">
+										<!-- <a href="#self">아이디찾기</a> -->
+										<a href="index.htm?mode=find_pass">비밀번호 찾기/설정</a>
+										<!-- a href="index.htm?mode=mp_sign">회원가입</a -->
+									</div>
+								</div>
+{*
+								<div class="sns-Login">
+									<p class="title">SNS 계정으로 간편하게 인바이유 하세요!</p>
+									<div><a href="sns_join_2.html"><img src="img/v3/btn/btn_login_sns_1.gif" alt="facebook" /></a></div>
+									<div><a href="#self"><img src="img/v3/btn/btn_login_sns_2.gif" alt="kakao" /></a></div>
+									<div><a href="#self"><img src="img/v3/btn/btn_login_sns_3.gif" alt="NAVER" /></a></div>
+									<div><a href="#self"><img src="img/v3/btn/btn_login_sns_4.gif" alt="Instagram" /></a></div>
+								</div>
+*}
+							</div><!-- end : class : login-Box -->
+
+
+				</div><!-- end : class : sub_contents -->
+			</div><!-- end : id : contents -->
+			<input type="hidden" id="url" value="{$_GET.url}">
+
+
+
+
+{* COPYRIGHT *}
+{include file = "../include/inbyu_v3/htmlMobCopyright.inc"}
+
+{* BOTTOM *}
+{include file = "../include/inbyu_v3/htmlMobBottom.inc"}
