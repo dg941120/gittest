@@ -1,0 +1,562 @@
+
+{* 최상단 HEAD *}
+{include file = "../include/inbyu_v3/htmlMobHead.inc"}
+
+{* BODY *}
+{include file = "../include/inbyu_v3/htmlMobBody.inc"}
+
+{* TOP *}
+{include file = "../include/inbyu_v3/htmlMobTop.inc"}
+
+{literal}
+<script type="text/javascript">
+<!--
+
+function frmSubmit(f_data)
+{
+	var action = f_data['action'];
+
+	$.ajax({
+		type: "POST",
+		url: action,
+		data: f_data,
+		dataType: 'json',
+		success: function(response) {
+			if(response) {
+
+				if(response.msg)
+					alert(response.msg);
+
+				if(response.state == '1') {
+
+					if(response.url)
+						location.replace(response.url);
+				}
+				else if(response.user_cnt == '1') {
+
+					$(".email_txt").html(response.msg);
+        			$(".email_txt").css("display","block");
+					$("#mail").val("");
+					$("#mail").focus();
+				}
+				else {
+
+        			$(".email_txt").css("display","none");
+					$("#email_check").val('1');
+					$("#pass").focus();
+				}
+			}
+		}
+	});
+	return false;
+}
+//-->
+</script>
+{/literal}
+{if !$_SESSION.SNS.ID}
+{literal}
+<script type="text/javascript">
+<!--
+$(document).ready(function() {
+
+	$(".id-check").click(function(){
+
+		var email_check = '';
+
+		if($("#mail").val() == "") {
+
+            $(".email_txt").html("이메일을 입력하세요");
+        	$(".email_txt").css("display","block");
+            $("#mail").focus();
+		}
+		else {
+
+			var regex=/^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/;
+
+			var email = $("#mail").val();
+
+			if(regex.test(email) === false){
+
+            	$(".email_txt").html("이메일을 올바르게 입력하세요....");
+        		$(".email_txt").css("display","block");
+				$("#mail").val("");
+				$("#mail").focus();
+				return false;
+			}
+
+			email_check = '1';
+
+			var f_data = {
+				action: '/index.htm',
+				mode: 'join',
+				mtype: 'search',
+				email: email,
+			};
+			frmSubmit(f_data);
+		}
+	});
+
+
+	$("#mail").focusout(function() {
+
+		var regex=/^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/;
+
+		var email = $("#mail").val();
+
+		if(regex.test(email) === false){
+
+			$(".email_txt").html("이메일을 올바르게 입력하세요.");
+			$(".email_txt").css("display","block");
+//			$("#mail").val("");
+			//$("#mail").focus();
+			return false;
+		}
+	});
+
+
+	$("#mail").keyup(function() {
+
+       $(".email_txt").html("이메일을 확인하세요");
+       $(".email_txt").css("display","none");
+	   $("#email_check").val('0');
+	});
+
+	$("#pass").keyup(function() {
+
+		if($("#pass").val() == "") {
+
+			return false;
+		}
+
+		if($("#pass").val().length < 6 || $("#pass").val().length > 16) {
+
+			$(".pass_txt").css("display","block");
+        	$(".pass_txt").html("비밀번호는 문자, 숫자, 특수문자의 조합으로 6~15자리로 입력해주세요.");
+			return false;
+		}
+		else if(!$("#pass").val().match(/([a-zA-Z0-9].*[`,!,@,#,$,%,^,&,*,?,_,~,\-,(,),+,_,,,/,:,;,<,=,>,{,},~,|,\\,\',\",\[,\]])|([`,!,@,#,$,%,^,&,*,?,_,~,\-,(,),+,_,,,/,:,;,<,=,>,{,},~,|,\\,\',\",\[,\]].*[a-zA-Z0-9])/))  {
+
+			$(".pass_txt").html("비밀번호는 문자, 숫자, 특수문자의 조합으로 6~15자리로 입력해주세요.");
+	        return false;
+		}
+		else {
+
+			$(".pass_txt").css("display","none");
+			$(".pass_txt").html("");
+		}
+	});
+
+	$("#passChk").keyup(function() {
+
+		if($("#pass").val() != "" && $("#passChk").val() != ""){
+
+			if($("#pass").val() != $("#passChk").val()){
+
+	        	$(".pass_txt2").css("display","block");
+			}
+			else {
+
+	        	$(".pass_txt2").css("display","none");
+			}
+		}
+	});
+
+	$(".ok-chk").click(function() {
+
+		var regex=/^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/;
+
+		var email = $("#mail").val();
+
+		if(regex.test(email) === false){
+
+			$(".email_txt").html("이메일을 올바르게 입력하세요.");
+			$(".email_txt").css("display","block");
+			$("#mail").val("");
+			$("#mail").focus();
+			return false;
+		}
+
+		if($("#mail").val() == "") {
+
+        	$(".email_txt").css("display","block");
+		}
+		if($("#pass").val() == "") {
+
+        	$(".pass_txt").css("display","block");
+		}
+		if($("#passChk").val() == "") {
+
+        	$(".pass_txt2").css("display","block");
+		}
+
+		if($("#mail").val() == "" || $("#pass").val() == "" || $("#passChk").val() == "") {
+
+        	return false;
+		}
+
+		if($("#email_check").val() != '1') {
+
+			$(".email_txt").html("이메일 중복확인을 해주세요");
+			$(".email_txt").css("display","block");
+			$("#mail").focus();
+			return false;
+		}
+
+		var agree_cnt = 0;
+		var agree_msg = "";
+		$("input:checkbox[name='agree']").each(function(index){
+
+			if($(this).is(":checked") == false) {
+
+				alert($(this).attr("title") + agree_msg);
+				agree_cnt++;
+				return false;
+			}
+		});
+
+		if(agree_cnt > 0) {
+
+			return false;
+		}
+
+		if($(".email_txt").css("display") != "none"){
+
+			$(".email_txt").html("이메일 중복확인을 해주세요");
+			return false;
+		}
+
+		var f_data = {
+			action: '/index.htm',
+			mode: 'join',
+			mtype: 'proc',
+			email: $("#mail").val(),
+			pass: $("#pass").val(),
+			passChk: $("#passChk").val(),
+			mk: $("#mk").is(":checked"),
+		};
+		frmSubmit(f_data);
+	});
+});
+//-->
+</script>
+{/literal}
+{else}
+{literal}
+<script type="text/javascript">
+<!--
+$(document).ready(function() {
+
+	$(".id-check").click(function(){
+
+		var email_check = '';
+
+		if($("#mail").val() == "") {
+
+            $(".email_txt").html("이메일을 입력하세요");
+        	$(".email_txt").css("display","block");
+            $("#mail").focus();
+		}
+		else {
+
+			var regex=/^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/;
+
+			var email = $("#mail").val();
+
+			if(regex.test(email) === false){
+
+            	$(".email_txt").html("이메일을 올바르게 입력하세요....");
+	       		$(".email_txt").css("display","block");
+				$("#mail").val("");
+				$("#mail").focus();
+				return false;
+			}
+
+			email_check = '1';
+
+			var f_data = {
+				action: '/index.htm',
+				mode: 'join',
+				mtype: 'search',
+				email: email,
+			};
+			frmSubmit(f_data);
+		}
+	});
+
+	$("#mail").focusout(function() {
+
+		var regex=/^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/;
+
+		var email = $("#mail").val();
+
+		if(regex.test(email) === false){
+
+			$(".email_txt").html("이메일을 올바르게 입력하세요.");
+			$(".email_txt").css("display","block");
+//			$("#mail").val("");
+		//	$("#mail").focus();
+			return false;
+		}
+	});
+
+	$("#mail").keyup(function() {
+
+       $(".email_txt").html("이메일을 확인하세요..");
+       $(".email_txt").css("display","none");
+	   $("#email_check").val('0');
+	});
+
+	$(".ok-chk").click(function() {
+
+		var regex=/^([\w-]+(?:\.[\w-]+)*)@((?:[\w-]+\.)*\w[\w-]{0,66})\.([a-z]{2,6}(?:\.[a-z]{2})?)$/;
+
+		var email = $("#mail").val();
+
+		if(regex.test(email) === false){
+
+			$(".email_txt").html("이메일을 올바르게 입력하세요.");
+			$(".email_txt").css("display","block");
+			$("#mail").val("");
+			$("#mail").focus();
+			return false;
+		}
+
+		if($("#mail").val() == "") {
+
+        	$(".email_txt").css("display","block");
+		}
+
+		if($("#mail").val() == "") {
+
+        	return false;
+		}
+
+		if($("#email_check").val() != '1') {
+
+			$(".email_txt").html("이메일 중복확인을 해주세요");
+			$(".email_txt").css("display","block");
+			$("#mail").focus();
+			return false;
+		}
+
+		var agree_cnt = 0;
+		var agree_msg = "";
+		$("input:checkbox[name='agree']").each(function(index){
+
+			if($(this).is(":checked") == false) {
+
+				alert($(this).attr("title") + agree_msg);
+				agree_cnt++;
+				return false;
+			}
+		});
+
+		if(agree_cnt > 0) {
+
+			return false;
+		}
+
+		if($(".email_txt").css("display") != "none"){
+
+			$(".email_txt").html("이메일 중복확인을 해주세요");
+			return false;
+		}
+
+		var f_data = {
+			action: '/index.htm',
+			mode: 'sns',
+			mtype: 'proc',
+			email: $("#mail").val(),
+			pass: $("#pass").val(),
+			passChk: $("#passChk").val(),
+			mk: $("#mk").is(":checked"),
+		};
+		frmSubmit(f_data);
+	});
+});
+//-->
+</script>
+{/literal}
+{/if}
+			<div id="visual">
+				<h2 class="hide">비쥬얼</h2>
+
+				<!-- <div class="sub-visual">
+
+				</div> -->
+			</div><!-- end : id : visual -->
+
+			<div id="contents">
+				<h2 class="hide">컨텐츠</h2>
+				<div class="sub_contents">
+					<h3 class="sub_Title ">
+						<a href="#self" class="back"><img src="img/v3/btn/btn_back.jpg" alt="이전페이지 가기" /></a>
+						회원가입
+					</h3>
+
+					<div class="in_box">
+
+						<form action="" method="post">
+						<input type="hidden" id="email_check">
+							<div class="join-input">
+
+								<dl class="input-zip">
+									<dt><label for="mail">이메일(ID)</label></dt>
+									<dd class="type">
+										<div class="input inputPlace"><label for="mail">abcd@inbyu.com</label><input type="email" id="mail" title="이메일을 입력하세요" /></div>
+										<div class="btn id-check"><a href="#self">중복확인</a></div>
+										<div class="alert email_txt" style="display:none;">이메일을 올바르게 입력하세요.</div>
+									</dd>
+{if !$_SESSION.SNS.ID}
+									<dt><label for="pass">비밀번호</label></dt>
+									<dd>
+										<div class="input inputPlace"><label for="pass">비밀번호를 6~15자리로 입력하세요</label><input type="password" id="pass" title="비밀번호를 6~15자리로 입력하세요"  maxlength="15"/> </div>
+										<div class="alert pass_txt" style="display:none;">비밀번호를 올바르게 입력하세요.</div>
+									</dd>
+									<dt><label for="passChk">비밀번호 확인</label></dt>
+									<dd>
+										<div class="input inputPlace"><label for="passChk">비밀번호를 6~15자리로 입력하세요</label><input type="password" id="passChk" title="비밀번호를 6~15자리로 입력하세요"  maxlength="15"/> </div>
+										<div class="alert pass_txt2" style="display:none;">비밀번호를 올바르게 재입력하세요.</div>
+									</dd>
+									<dt><label for="name">이름</label></dt>
+									<dd>
+										<div class="input inputPlace"><label for="name">홍길동</label><input type="text" id="name" value="{$_SESSION.CK.NAME}" readonly  /> </div>
+									</dd>
+									<dt><label for="birth">생년월일</label></dt>
+									<dd>
+										<div class="birth inputPlace"><label for="birth">생년월일 예:19901105</label><input type="tel" id="birth" value="{$_SESSION.CK.BIRTHDATE}" readonly /> </div>
+										<div class="sexRadio fix">
+												<div {$RS.gender1}><a href="#self">남</a></div><!-- addClass=on -->
+												<div {$RS.gender2}><a href="#self">여</a></div>
+										</div>
+									</dd>
+									<dt><label for="phone">휴대폰번호</label></dt>
+									<dd>
+										<div class="input inputPlace"><label for="phone">휴대폰번호 입력</label><input type="tel" id="phone" value="{$_SESSION.CK.MOBILENO}" readonly /> </div>
+									</dd>
+{else}
+										<input type="hidden" id="pass" name="pass" value="{$_SESSION.SNS.PW}" />
+										<input type="hidden" id="name" value="{$_SESSION.CK.NAME}" readonly />
+										<input type="hidden" id="birth" value="{$_SESSION.CK.BIRTHDATE}" readonly />
+										<input type="hidden" id="phone" value="{$_SESSION.CK.MOBILENO}" readonly />
+{/if}
+								</dl>
+							</div><!-- end : class : join-input -->
+
+							<div class="privacy-Box">
+								<div class="in">
+									<p class="chkMdu">
+										<label for="privacy_1" class="chkLabel"><input type="checkbox" id="privacy_1" name='agree' title="서비스 이용약관에 동의" /></label>
+										<label for="privacy_1"><b>서비스 이용약관</b>에 동의 (필수)</label>
+										<a href="info.htm?mode=agree" target="_blank" class="view ">내용보기</a><!-- ** popup ** -->
+									</p>
+									<p class="chkMdu">
+										<label for="privacy_2" class="chkLabel"><input type="checkbox" id="privacy_2" name='agree' title="개인정보취급방침에 동의" /></label>
+										<label for="privacy_2"><b>개인정보취급방침</b>에 동의 (필수)</label>
+										<a href="info.htm?mode=privacy" target="_blank" class="view ">내용보기</a><!-- ** popup ** -->
+									</p>
+									<p class="chkMdu">
+										<label for="mk" class="chkLabel"><input type="checkbox" id="mk" title="마케팅 활용에 동의시 체크하세요." /></label>
+										<label for="mk"><b>마케팅 활용</b>에 동의 합니다. (선택) </label>
+									</p>
+									<p class="info_txt"><span>※</span>상품의 만기도래, 회사의 주요정책 관련 내용은 마케팅동의 여부와 관계없이 발송됩니다.</p>
+								</div>
+							</div><!-- end : class : privacy-Box -->
+
+							<div class="btn_C_Area">
+									<a href="index.htm?mode=main" class="btnStyle greyHalf">취소</a>
+									<a href="#none" class="btnStyle blueHalf ok-chk">확인</span></a>
+							</div>
+						</form>
+
+					</div>
+
+				</div><!-- end : class : sub_contents -->
+			</div><!-- end : id : contents -->
+
+			<!-- *** Layer Popup *** -->
+			<!--
+				* class="popup" 팝업보기 버튼
+				* class="lyPopup" 개별 팝업
+				*** 페이지에 팝업이 2개일시 lyPopup 2개 생성 ***
+			-->
+			{literal}
+			<script type="text/javascript">
+			//<![CDATA[
+				$(document).ready(function(){
+					project.layerPopup();
+				});
+			//]]>
+			</script>
+			{/literal}
+
+			<div id="layer_Popup">
+				<!-- : start : popup : -->
+				<div class="lyPopup">
+					<p class="title">서비스 이용 약관</p>
+					<div class="inner" style="height:260px">
+						<div class="scroll">
+							약관 내용을 넣어주세요.
+							약관 내용을 넣어주세요.
+							약관 내용을 넣어주세요.<br />
+							약관 내용을 넣어주세요.약관 내용을 넣어주세요.<br />
+							약관 내용을 넣어주세요.약관 내용을 넣어주세요.<br />
+							약관 내용을 넣어주세요.약관 내용을 넣어주세요.<br />
+							약관 내용을 넣어주세요.약관 내용을 넣어주세요.<br />
+							약관 내용을 넣어주세요.약관 내용을 넣어주세요.<br />
+							약관 내용을 넣어주세요.약관 내용을 넣어주세요.<br />
+							약관 내용을 넣어주세요.약관 내용을 넣어주세요.<br />
+							약관 내용을 넣어주세요.약관 내용을 넣어주세요.<br />
+							약관 내용을 넣어주세요.<br />
+							약관 내용을 넣어주세요.
+						</div>
+					</div>
+
+					<div class="btn"><a href="#self">확인</a></div>
+					<div class="close"><img src="img/v3/btn/btn_popClose.jpg" alt="레이어팝업닫기" /></div>
+				</div><!-- end : class : lyPopup -->
+
+				<div class="lyPopup">
+					<p class="title">개인정보취급방침</p>
+					<div class="inner" style="height:260px">
+						<div class="scroll">
+							개인정보취급방침 내용을 넣어주세요.
+							개인정보취급방침 내용을 넣어주세요.
+							개인정보취급방침 내용을 넣어주세요.
+							개인정보취급방침 내용을 넣어주세요.
+							개인정보취급방침 내용을 넣어주세요.
+							개인정보취급방침 내용을 넣어주세요.
+							개인정보취급방침 내용을 넣어주세요.
+							개인정보취급방침 내용을 넣어주세요.
+							개인정보취급방침 내용을 넣어주세요.
+							개인정보취급방침 내용을 넣어주세요.
+							개인정보취급방침 내용을 넣어주세요.
+							개인정보취급방침 내용을 넣어주세요.
+							개인정보취급방침 내용을 넣어주세요.
+							개인정보취급방침 내용을 넣어주세요.
+							개인정보취급방침 내용을 넣어주세요.
+							개인정보취급방침 내용을 넣어주세요.
+							개인정보취급방침 내용을 넣어주세요.
+							개인정보취급방침 내용을 넣어주세요.
+							개인정보취급방침 내용을 넣어주세요.
+							개인정보취급방침 내용을 넣어주세요.
+						</div>
+					</div>
+
+					<div class="btn"><a href="#self">확인</a></div>
+					<div class="close"><img src="img/v3/btn/btn_popClose.jpg" alt="레이어팝업닫기" /></div>
+				</div><!-- end : class : lyPopup -->
+
+				<!-- : end : popup : -->
+			</div><!-- end : id : layer_Popup -->
+			<!-- *** Layer Popup *** -->
+
+
+
+
+
+{* COPYRIGHT *}
+{include file = "../include/inbyu_v3/htmlMobCopyright.inc"}
+
+{* BOTTOM *}
+{include file = "../include/inbyu_v3/htmlMobBottom.inc"}
