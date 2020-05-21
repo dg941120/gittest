@@ -1,0 +1,84 @@
+
+<!-- POPUP START -->
+{literal}
+<script type="text/javascript">
+//<![CDATA[
+	function setCookie( name, value, expiredays ) {
+		var todayDate = new Date();
+		todayDate.setDate( todayDate.getDate() + expiredays );
+		document.cookie = name + "=" + escape( value ) + "; path=/; expires=" + todayDate.toGMTString() + ";"
+	}
+
+	$(document).ready(function(){
+		$("#main_Popup .close").click(function(){
+			if($("#today").is(':checked')){
+				setCookie( "topPop1", "done" , 360 );//1, 7, 360 해당 기간
+			};
+
+			$('#main_Popup').fadeOut();
+		});
+
+		cookiedata = document.cookie;
+		if ( cookiedata.indexOf("topPop1=done") < 0 ){
+			document.all['main_Popup'].style.display = "block";
+		} else {
+			document.all['main_Popup'].style.display = "none";
+		}
+	});
+//]]>
+</script>
+{/literal}
+
+			<!-- *** Layer Popup *** -->
+			<div id="main_Popup">
+				<div class="Popup event">
+					<div class="obj-box"><a href="http://inbyu.com/info.htm?mode=event"><img src="img/v3/contents/credif_Popup.png" alt="서비스 가입고객 100% 스타벅스 아메리카노 증정!" /></a></div>
+					<div class="close"><img src="img/v3/btn/btn_popClose.png" alt="레이어팝업 닫기" /></div>
+					<div class="todayClose">
+						<p class="chkMdu">
+							<label for="today" class="chkLabel"><input type="checkbox" id="today" title="오늘 하루 열지 않기" /></label>
+							<label for="today">오늘 하루 열지 않기</label>
+						</p>
+					</div>
+				</div><!-- end : class : Popup -->
+			</div>
+			<!-- *** Layer Popup *** -->
+
+
+
+			<!-- *** Layer Popup *** -->
+			<div id="main_Popup">
+				<div class="Popup open"><!-- open = 리뉴얼 팝업 -->
+					<div class="in_p">
+						<div class="renewal">
+							<div class="renewal_obj"><img src="img/v3/contents/renewal_obj.gif" alt="RENEWAL OPEN" /></div>
+							<dl class="renewal_info">
+								<dt>인바이유 개편 안내</dt>
+								<dd>
+									안녕하세요. 보험 공동구매 플랫폼 인바이유 입니다.<br />
+									2018년 4월 25일부터 인바이유 웹사이트가 개편 되었습니다!<br />
+									<br />
+									개편된 웹사이트에서 회원가입 기능이 추가되었으며<br />
+									회원가입 후, 보험/서비스를 가입하신 경우 [가입내역 조회]에서 <br />
+									기존에 가입하신 상품내역은 보이지 않습니다.<br />
+									<br />
+									회원로그인 후 기존 가입내역 확인을 원하시면<br />
+									[1:1 문의]를 통해 ‘가입내역 복원 신청’을 해 주시면<br />
+									내역을 확인하실 수 있도록 처리해 드리겠습니다.<br />
+									감사합니다.
+								</dd>
+							</dl>
+						</div>
+					</div><!-- end : class : in_p -->
+					<div class="close"><img src="img/v3/btn/btn_popClose.png" alt="레이어팝업 닫기" /></div>
+					<div class="todayClose">
+						<p class="chkMdu">
+							<label for="today" class="chkLabel"><input type="checkbox" id="today" title="다시보지 않기" /></label>
+							<label for="today">다시보지 않기</label>
+						</p>
+					</div>
+				</div><!-- end : class : Popup -->
+			</div><!-- end : id : main_Popup -->
+			<!-- *** Layer Popup *** -->
+<!-- POPUP END -->
+<!-- POPUP END -->
